@@ -102,9 +102,6 @@ private:
     unsigned int sampleRate;
     unsigned int channels;
 
-    QString baseApi = "https://speech.googleapis.com/v1/speech:recognize";
-    QString apiKey = "your api key";
-
     bool initFlacDecoder(char* flacfile);
 
     char* allocate_buffer();
