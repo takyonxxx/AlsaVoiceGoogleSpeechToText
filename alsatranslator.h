@@ -40,7 +40,7 @@ private:
     QFile file;
 
     QString baseApi = "https://speech.googleapis.com/v1/speech:recognize";
-    QString apiKey = "AIzaSyCY8Xg5wfn6Ld67287SGDBQPZvGCEN6Fsg";
+    QString apiKey = "your api key";
 
     QUrl url;
     QString filePath;
