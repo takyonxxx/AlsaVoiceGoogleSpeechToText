@@ -12,7 +12,7 @@ Use this Qt c++17 project to send a recognize REST request to the Speech-to-Text
 </br>
 Project records your voice to flac file and Create a JSON request file with the following QJsonDocument:</br>
 My language is Turkish, you may set it to English. ("en-US")</br>
-</br></br>
+</br>
  QFile file{};</br>
  file.setFileName("your recorded flac file name with path");</br>
  </br>
@@ -34,7 +34,6 @@ My language is Turkish, you may set it to English. ("en-US")</br>
                 }}</br>
                     }</br>
     };</br>
-</br>
 </br>  
 This JSON snippet indicates that the audio file has a FLAC encoding format, a sample rate of your samplerate in Hz,</br>
 and that the audio flac file data is fileData.</br>
