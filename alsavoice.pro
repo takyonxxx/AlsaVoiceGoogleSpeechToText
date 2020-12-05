@@ -22,6 +22,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     alsarecorder.h \
     alsatranslator.h \
+    constants.h \
     qaudiotranslator.h
 
 win32 {

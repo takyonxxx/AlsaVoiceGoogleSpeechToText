@@ -15,8 +15,8 @@ QAudioTranslator::QAudioTranslator(QObject *parent)
     this->audioRecorder.setEncodingSettings(audioSettings);
     this->audioRecorder.setOutputLocation(filePath);
 
-    this->url.setUrl(this->baseApi);
-    this->url.setQuery("key=" + this->apiKey);
+    this->url.setUrl(baseApi);
+    this->url.setQuery("key=" + apiKey);
 
     this->request.setUrl(this->url);
     this->request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -79,7 +79,8 @@ QAudioTranslator::QAudioTranslator(QObject *parent)
             setError(error.toString());
         }
 
-        record();
+        if(!m_stop)
+            record();
     });
 
     qDebug() << "Flac location:" << this->filePath;

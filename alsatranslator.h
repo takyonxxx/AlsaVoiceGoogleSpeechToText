@@ -17,6 +17,7 @@
 #include <QJsonObject>
 #include <QElapsedTimer>
 #include "alsarecorder.h"
+#include "constants.h"
 
 class AlsaTranslator:public QObject
 {
@@ -38,10 +39,6 @@ private:
     QNetworkAccessManager qam;
     QNetworkRequest request;
     QFile file;
-
-    QString baseApi = "https://speech.googleapis.com/v1/speech:recognize";
-    QString apiKey = "your api key";
-
     QUrl url;
     QString filePath;
 
@@ -55,7 +52,7 @@ private:
     QString command = ""; // last command
     QString speech = ""; // last speech
     QString error = ""; // last error
-    int recordDuration = 2500; // recording duration in miliseconds
+    int recordDuration = 3000; // recording duration in miliseconds
     bool running = false; // translation state
 
     QElapsedTimer timer;

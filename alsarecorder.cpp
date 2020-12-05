@@ -2,7 +2,7 @@
 
 ALSARecorder::ALSARecorder(QObject *parent)
     : QThread(parent)
-{
+{    
 }
 
 ALSARecorder::~ALSARecorder()
@@ -157,88 +157,6 @@ unsigned int ALSARecorder::get_bytes_per_frame() {
     return size_of_one_frame;
 }
 
-
-int ALSARecorder::init_wav_header()
-{
-    wav_h.ChunkID[0]     = 'R';
-    wav_h.ChunkID[1]     = 'I';
-    wav_h.ChunkID[2]     = 'F';
-    wav_h.ChunkID[3]     = 'F';
-
-    wav_h.Format[0]      = 'W';
-    wav_h.Format[1]      = 'A';
-    wav_h.Format[2]      = 'V';
-    wav_h.Format[3]      = 'E';
-
-    wav_h.Subchunk1ID[0] = 'f';
-    wav_h.Subchunk1ID[1] = 'm';
-    wav_h.Subchunk1ID[2] = 't';
-    wav_h.Subchunk1ID[3] = ' ';
-
-    wav_h.Subchunk2ID[0] = 'd';
-    wav_h.Subchunk2ID[1] = 'a';
-    wav_h.Subchunk2ID[2] = 't';
-    wav_h.Subchunk2ID[3] = 'a';
-
-    wav_h.NumChannels = channels;
-    wav_h.BitsPerSample = 16;
-    wav_h.Subchunk2Size = 300 * MAX_SAMPLES * (uint32_t) wav_h.NumChannels * (uint32_t) wav_h.BitsPerSample / 8;
-    //wav_h.Subchunk2Size = 0xFFFFFFFF;
-    wav_h.ChunkSize = (uint32_t) wav_h.Subchunk2Size + 36;
-    wav_h.Subchunk1Size = 16;
-    wav_h.AudioFormat = 1;
-    wav_h.SampleRate = sampleRate;
-    wav_h.ByteRate = (uint32_t) wav_h.SampleRate
-            * (uint32_t) wav_h.NumChannels
-            * (uint32_t) wav_h.BitsPerSample / 8;
-    wav_h.BlockAlign = (uint32_t) wav_h.NumChannels * (uint32_t) wav_h.BitsPerSample / 8;
-
-    return EXIT_SUCCESS;
-}
-
-int ALSARecorder::init_wav_file(char *fname)
-{
-    if(FileExists(fname))
-    {
-        std::remove(fname); // delete file
-    }
-
-    fwav = fopen(fname, "wb");
-
-    if (fwav != NULL)
-        fwrite(&wav_h, 1, sizeof(wav_h), fwav);
-    else
-    {
-        std::cerr << "cannot open wav file to write data" << "\n";
-        return FOPEN_ERROR;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-int ALSARecorder::close_wav_file()
-{
-    if (fwav != nullptr)
-        fclose(fwav);
-    else
-    {
-        std::cerr << "cannot close wav file" << "\n";
-        return FCLOSE_ERROR;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-void ALSARecorder::set_record_file(char *aFileName)
-{
-    fname = aFileName;
-    if(fname)
-    {
-        init_wav_header();
-        init_wav_file(fname);
-    }
-}
-
 unsigned int ALSARecorder::capture_into_buffer(char* buffer) {
 
     snd_pcm_sframes_t frames_read = snd_pcm_readi(capture_handle, buffer, get_frames_per_period());
@@ -256,50 +174,30 @@ unsigned int ALSARecorder::capture_into_buffer(char* buffer) {
     return frames_read;
 }
 
-int ALSARecorder::encodePcm(const char *wavfile, const char *flacfile)
+bool ALSARecorder::initFlacDecoder(char *flacfile)
 {
     FLAC__bool ok = true;
-    FLAC__StreamEncoder *encoder = 0;
     FLAC__StreamEncoderInitStatus initStatus;
-    FILE *fin;
-
-    unsigned bps = 0;
-
-    if((fin = fopen(wavfile, "rb")) == NULL)
-    {
-        fprintf(stderr, "ERROR: opening %s for output\n", wavfile);
-        return 1;
-    }
-
-    if (fread(buffer, 1, 44, fin) != 44 || memcmp(buffer, "RIFF", 4))
-    {
-        fprintf(stderr, "ERROR: invalid/unsupported WAVE file.\n");
-        fclose(fin);
-        return 1;
-    }
-
-    bps = 16;
-    totalSamples = (((((((unsigned)buffer[43] << 8) | buffer[42]) << 8) | buffer[41]) << 8) | buffer[40]) / 4;
+    totalSamples = 0;
 
     /* allocate the encoder */
-    if((encoder = FLAC__stream_encoder_new()) == NULL)
+    if((pcm_encoder = FLAC__stream_encoder_new()) == NULL)
     {
         fprintf(stderr, "ERROR: allocating encoder\n");
-        fclose(fin);
-        return 1;
+        return false;
     }
 
-    ok &= FLAC__stream_encoder_set_verify(encoder, true);
-    ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
-    ok &= FLAC__stream_encoder_set_channels(encoder, channels);
-    ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bps);
-    ok &= FLAC__stream_encoder_set_sample_rate(encoder, sampleRate);
-    ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, totalSamples);
+    ok &= FLAC__stream_encoder_set_verify(pcm_encoder, true);
+    ok &= FLAC__stream_encoder_set_compression_level(pcm_encoder, 5);
+    ok &= FLAC__stream_encoder_set_channels(pcm_encoder, channels);
+    ok &= FLAC__stream_encoder_set_bits_per_sample(pcm_encoder, bps);
+    ok &= FLAC__stream_encoder_set_sample_rate(pcm_encoder, sampleRate);
+    ok &= FLAC__stream_encoder_set_total_samples_estimate(pcm_encoder, totalSamples);
 
     /* initialize encoder */
     if(ok)
     {
-        initStatus = FLAC__stream_encoder_init_file(encoder, flacfile, progress_callback, nullptr);
+        initStatus = FLAC__stream_encoder_init_file(pcm_encoder, flacfile, nullptr, nullptr);
         if(initStatus != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
         {
             fprintf(stderr, "ERROR: initializing encoder: %s\n", FLAC__StreamEncoderInitStatusString[initStatus]);
@@ -307,55 +205,34 @@ int ALSARecorder::encodePcm(const char *wavfile, const char *flacfile)
         }
     }
 
-    /* read blocks of samples from WAVE file and feed to encoder */
-    if(ok)
-    {
-        fprintf(stdout, "Encoding: ");
-        size_t left = (size_t)totalSamples;
-        while(ok && left)
-        {
-            size_t need = (left>READSIZE ? (size_t)READSIZE : (size_t)left);
-            if (fread(buffer, channels * (bps / 8), need, fin) != need)
-            {
-                ok = false;
-            }
-            else
-            {
-                /* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
-                size_t i;
-                for(i = 0; i < need*channels; i++)
-                {
-                    /* inefficient but simple and works on big- or little-endian machines */
-                    pcm[i] = (FLAC__int32)(((FLAC__int16)(FLAC__int8)buffer[2 * i + 1] << 8) | (FLAC__int16)buffer[2 * i]);
-                }
-                /* feed samples to encoder */
-                ok = FLAC__stream_encoder_process_interleaved(encoder, pcm, need);
-            }
-            left -= need;
-        }
-    }
-
-    if (!FLAC__stream_encoder_finish(encoder))
-    {
-        return fprintf(stderr, "ERROR: finishing encoder: %s\n", FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
-    }
-
-    FLAC__stream_encoder_delete(encoder);
-
-    fclose(fin);
-    return 0;
+    return ok;
 }
 
+bool ALSARecorder::finishFlacDecoder()
+{
+    if(!pcm_encoder)
+        return false;
+
+    if (!FLAC__stream_encoder_finish(pcm_encoder))
+    {
+        fprintf(stderr, "ERROR: finishing encoder: %s\n", FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(pcm_encoder)]);
+        return false;
+    }
+
+    FLAC__stream_encoder_delete(pcm_encoder);
+
+    return true;
+}
 
 bool ALSARecorder::record(int mseconds)
 {  
     if(!capture_handle)
         return false;
 
-    auto wavFile = fileName;
-    wavFile = wavFile.replace("flac", "wav");
+    FLAC__bool flac_ok = true;
+    FLAC__int32 pcm[get_frames_per_period() * channels];
 
-    set_record_file((char*)wavFile.toStdString().c_str());
+    initFlacDecoder((char*)fileName.toStdString().c_str());
 
     char* buffer = allocate_buffer();
     auto endwait = QDateTime::currentMSecsSinceEpoch() + mseconds;
@@ -367,27 +244,29 @@ bool ALSARecorder::record(int mseconds)
 
         auto read = capture_into_buffer(buffer);
 
-        if (fwav != nullptr)
+        if(read == 0)
+            continue;
+
+        totalSamples = read;
+        size_t left = (size_t)totalSamples;
+        while(flac_ok && left)
         {
-            fwrite(buffer, 1, read * 2 * channels, fwav);
+            /* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
+            size_t i;
+            for(i = 0; i < read*channels; i++)
+            {
+                /* inefficient but simple and works on big- or little-endian machines */
+                pcm[i] = (FLAC__int32)(((FLAC__int16)(FLAC__int8)buffer[2 * i + 1] << 8) | (FLAC__int16)buffer[2 * i]);
+            }
+            /* feed samples to encoder */
+            flac_ok = FLAC__stream_encoder_process_interleaved(pcm_encoder, pcm, read);
+            left -= read;
         }
 
-    } while (QDateTime::currentMSecsSinceEpoch() < endwait);
 
-    if (fwav != nullptr)
-    {
-        fwrite(&wav_h, 1, sizeof(wav_h), fwav);
-        close_wav_file();
-    }
+    } while (QDateTime::currentMSecsSinceEpoch() < endwait);  
 
-    encodePcm((char*)wavFile.toStdString().c_str(), (char*)fileName.toStdString().c_str());
-
-    if (fwav != nullptr)
-    {
-        if( remove(wavFile.toStdString().c_str()) != 0 )
-            perror( "Error deleting wav file" );
-    }
-
+    finishFlacDecoder();
     emit stateChanged(StoppedState);
     return true;
 }

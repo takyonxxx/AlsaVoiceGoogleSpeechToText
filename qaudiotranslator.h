@@ -17,6 +17,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QElapsedTimer>
+#include "constants.h"
 
 class QAudioTranslator:public QObject
 {
@@ -39,10 +40,6 @@ private:
     QNetworkAccessManager qam;
     QNetworkRequest request;
     QFile file;
-
-    QString baseApi = "https://speech.googleapis.com/v1/speech:recognize";
-    QString apiKey = "your api key";
-
     QUrl url;
     QString filePath;
 

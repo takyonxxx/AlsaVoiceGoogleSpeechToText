@@ -13,8 +13,8 @@ AlsaTranslator::AlsaTranslator(QObject *parent)
     this->audioRecorder.setSampleRate(44100);
     this->audioRecorder.initCaptureDevice();
 
-    this->url.setUrl(this->baseApi);
-    this->url.setQuery("key=" + this->apiKey);
+    this->url.setUrl(baseApi);
+    this->url.setQuery("key=" + apiKey);
 
     this->request.setUrl(this->url);
     this->request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -35,16 +35,17 @@ AlsaTranslator::AlsaTranslator(QObject *parent)
         auto data = QJsonDocument::fromJson(response->readAll());
         response->deleteLater();
 
-        QString strFromJson = QJsonDocument(data).toJson(QJsonDocument::Compact).toStdString().c_str();
+        //QString strFromJson = QJsonDocument(data).toJson(QJsonDocument::Compact).toStdString().c_str();
 
         auto error = data["error"]["message"];
 
         if (error.isUndefined()) {
             auto command = data["results"][0]["alternatives"][0]["transcript"].toString();
+            auto confidence = data["results"][0]["alternatives"][0]["confidence"].toDouble();
             if(!command.isEmpty())
-                emit speechChanged(command);
+                emit speechChanged(command + " %" + QString::number(int(confidence * 100)));
             else
-                emit speechChanged(strFromJson);
+                emit speechChanged("Not understood!");
 
             setRunning(false);
             setCommand(command);
@@ -54,7 +55,8 @@ AlsaTranslator::AlsaTranslator(QObject *parent)
             setError(error.toString());
         }
 
-        record();
+        if(!m_stop)
+            record();
     });
 
     qDebug() << "Flac location:" << this->filePath;
@@ -83,6 +85,7 @@ void AlsaTranslator::translate() {
                     {"encoding", "FLAC"},
                     {"languageCode", "tr-TR"},
                     {"model", "command_and_search"},
+                    {"enableWordTimeOffsets", false},
                     {"sampleRateHertz", (int)audioRecorder.getSampleRate()}
                 }}
                     }
