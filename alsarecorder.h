@@ -40,8 +40,6 @@ protected:
     snd_pcm_format_t format{SND_PCM_FORMAT_S16_BE};
     FLAC__StreamEncoder *pcm_encoder{nullptr};
     bool m_stop{false};
-
-    void set_hw_params();
 public:
 
     explicit ALSARecorder(QObject *parent = nullptr);
