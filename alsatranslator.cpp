@@ -99,6 +99,11 @@ void AlsaTranslator::stop()
     m_stop = true;
 }
 
+void AlsaTranslator::setRecordDuration(int value)
+{
+    recordDuration = value;
+}
+
 void AlsaTranslator::record()
 {
     qDebug() << "Listening...";

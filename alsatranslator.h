@@ -35,6 +35,8 @@ public:
     Q_PROPERTY(bool running READ getRunning NOTIFY runningChanged)
 
 
+    void setRecordDuration(int value);
+
 private:
     QNetworkAccessManager qam;
     QNetworkRequest request;

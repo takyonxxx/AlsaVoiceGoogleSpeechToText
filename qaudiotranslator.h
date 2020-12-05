@@ -54,7 +54,7 @@ private:
     QString command = ""; // last command
     QString speech = ""; // last speech
     QString error = ""; // last error
-    int recordDuration = 2000; // recording duration in miliseconds
+    int recordDuration = 3000; // recording duration in miliseconds
     bool running = false; // translation state
 
     QElapsedTimer timer;
