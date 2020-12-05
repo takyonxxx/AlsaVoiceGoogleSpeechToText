@@ -33,7 +33,7 @@ My language is Turkish, you may set it to English. ("en-US")</br>
                     {"sampleRateHertz", (int)audioRecorder.getSampleRate()}</br>
                 }}</br>
                     }</br>
-    };</br>
+    };
 </br>  
 This JSON snippet indicates that the audio file has a FLAC encoding format, a sample rate of your samplerate in Hz,</br>
 and that the audio flac file data is fileData.</br>
