@@ -15,10 +15,8 @@ My language is Turkish, you may set it to English. ("en-US")</br>
 </br>
  QFile file{};</br>
  file.setFileName("your recorded flac file name with path");</br>
- </br>
  QByteArray fileData = file.readAll();</br>
  file.close();</br>
-</br>
  QJsonDocument data {</br>
         QJsonObject { {</br>
                 "audio",</br>
@@ -59,7 +57,7 @@ QObject::connect(google_speech, &AlsaTranslator::speechChanged, [](auto speech)<
 });</br>
 google_speech->setRecordDuration(3000);</br>
 google_speech->start();</br>
-</br></br>
+</br>
 My purpose of doing this project is to control my robot.</br> 
 I tried it in Raspberry Pi3 and works efficiently.</br>
 
