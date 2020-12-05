@@ -27,7 +27,6 @@ public:
     AlsaTranslator(QObject* parent);
 
     void start();
-    void stop();
 
     Q_PROPERTY(QString command READ getCommand NOTIFY commandChanged)
     Q_PROPERTY(QString error READ getError NOTIFY errorChanged)
@@ -108,8 +107,6 @@ signals:
     void errorChanged(QString text);
     void speechChanged(QString text);
 
-protected:
-    bool m_stop{false};
 };
 
 #endif // ALSATRANSLATOR_H

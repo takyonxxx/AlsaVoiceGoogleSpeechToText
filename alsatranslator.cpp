@@ -55,8 +55,7 @@ AlsaTranslator::AlsaTranslator(QObject *parent)
             setError(error.toString());
         }
 
-        if(!m_stop)
-            record();
+        record();
     });
 
     qDebug() << "Flac location:" << this->filePath;
@@ -73,7 +72,7 @@ void AlsaTranslator::translate() {
 
     QByteArray fileData = file.readAll();
     file.close();
-    //file.remove();
+    file.remove();
 
     QJsonDocument data {
         QJsonObject { {
@@ -94,11 +93,6 @@ void AlsaTranslator::translate() {
     qam.post(this->request, data.toJson(QJsonDocument::Compact));
 }
 
-void AlsaTranslator::stop()
-{
-    m_stop = true;
-}
-
 void AlsaTranslator::setRecordDuration(int value)
 {
     recordDuration = value;
@@ -106,8 +100,6 @@ void AlsaTranslator::setRecordDuration(int value)
 
 void AlsaTranslator::record()
 {
-    qDebug() << "Listening...";
-
     setError("");
     setCommand("");
     setRunning(true);

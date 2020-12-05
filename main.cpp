@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
         qDebug() << speech;
     });
 
-    google_speech->setRecordDuration(3000);
+    google_speech->setRecordDuration(2000);
 
     google_speech->start();
 
