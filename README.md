@@ -47,9 +47,8 @@ My settings are:</br>
 </br> 
 I use default sound card. Change it to your input sound card number.</br>
 (plughw:0,0, plughw:1,0, etc...)</br>    
-</br>
 And change the duration time according to your needs in miliseconds.</br>
-</br></br>
+</br>
 auto google_speech = new AlsaTranslator(nullptr);</br>
 QObject::connect(google_speech, &AlsaTranslator::speechChanged, [](auto speech)</br>
 {</br>
