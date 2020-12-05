@@ -50,8 +50,11 @@ unix:!macx{
 DISTFILES += \
     glscope/README
 
+
 #sudo apt-get install libasound2-dev
 #sudo apt-get install alsa alsa-tools
+#sudo apt-get install qtmultimedia5-dev
+#sudo apt install libqt5multimedia5-plugins
 #sudo apt-get install libflac-dev
 # flac -c -d *flac | aplay
 
