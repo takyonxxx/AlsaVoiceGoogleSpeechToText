@@ -1,7 +1,7 @@
 #include "alsarecorder.h"
 
 ALSARecorder::ALSARecorder(QObject *parent)
-    : QThread(parent)
+    : QObject(parent)
 {    
 }
 
