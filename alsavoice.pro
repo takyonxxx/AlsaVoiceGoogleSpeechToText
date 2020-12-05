@@ -40,30 +40,19 @@ macx{
 
 unix:!macx{
     message("Unix enabled")
-    #QMAKE_INCDIR += /usr/local/include
+    QMAKE_INCDIR += /usr/local/include
 
     QMAKE_LIBDIR += usr/lib
     QMAKE_LIBDIR += /usr/local/lib
-
-    INCLUDEPATH += /usr/local/include
-    INCLUDEPATH += /usr/local/include/pocketsphinx
-    INCLUDEPATH += /usr/local/include/sphinxbase
-    LIBS += -lasound -lsphinxbase -lpocketsphinx -lsphinxad
-    LIBS += -lFLAC
+    LIBS += -lasound -lFLAC
 }
 
 DISTFILES += \
     glscope/README
 
-#sudo apt-get install bison
-#sudo apt-get install swig
 #sudo apt-get install libasound2-dev
 #sudo apt-get install alsa alsa-tools
-#sudo apt install libsphinxbase-dev
-#sudo apt-get install libfftw3-dev
 #sudo apt-get install libflac-dev
-#pocketsphinx_continuous -infile test.wav -keyphrase "oh mighty computer" -kws_threshold 1e-20
-#sudo ldconfig
 # flac -c -d *flac | aplay
 
 RESOURCES +=
