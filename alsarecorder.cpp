@@ -283,7 +283,6 @@ bool ALSARecorder::record(int mseconds)
         emit stateChanged(StoppedState);
     });
     thread->start();
-    thread->wait();
 
     return true;
 }
