@@ -12,55 +12,55 @@ Use this Qt c++17 project to send a recognize REST request to the Speech-to-Text
 </br>
 Project records your voice to flac file and Create a JSON request file with the following QJsonDocument:</br>
 My language is Turkish, you may set it to English. ("en-US")</br>
+</br></br>
+ QFile file{};</br>
+ file.setFileName("your recorded flac file name with path");</br>
+ </br>
+ QByteArray fileData = file.readAll();</br>
+ file.close();</br>
 </br>
- QFile file{};
- file.setFileName("your recorded flac file name with path");
- 
- QByteArray fileData = file.readAll();
- file.close();
-
- QJsonDocument data {
-        QJsonObject { {
-                "audio",
-                QJsonObject { {"content", QJsonValue::fromVariant(fileData.toBase64())} }
-                      },  {
-                "config",
-                QJsonObject {
-                    {"encoding", "FLAC"},
-                    {"languageCode", "tr-TR"},
-                    {"model", "command_and_search"},
-                    {"enableWordTimeOffsets", false},
-                    {"sampleRateHertz", (int)audioRecorder.getSampleRate()}
-                }}
-                    }
-    };
-
+ QJsonDocument data {</br>
+        QJsonObject { {</br>
+                "audio",</br>
+                QJsonObject { {"content", QJsonValue::fromVariant(fileData.toBase64())} }</br>
+                      },  {</br>
+                "config",</br>
+                QJsonObject {</br>
+                    {"encoding", "FLAC"},</br>
+                    {"languageCode", "tr-TR"},</br>
+                    {"model", "command_and_search"},</br>
+                    {"enableWordTimeOffsets", false},</br>
+                    {"sampleRateHertz", (int)audioRecorder.getSampleRate()}</br>
+                }}</br>
+                    }</br>
+    };</br>
+</br>
 </br>  
 This JSON snippet indicates that the audio file has a FLAC encoding format, a sample rate of your samplerate in Hz,</br>
 and that the audio flac file data is fileData.</br>
 Important : </br>
 In my experience recording should be 1 channel.</br>
-
+</br>
 My settings are:</br>
     audioRecorder.setOutputLocation(filePath);</br>
     audioRecorder.setDeviceName((char*)"plughw:0,0");</br>
     audioRecorder.setChannels(1);</br>
     audioRecorder.setSampleRate(44100);</br>
     audioRecorder.initCaptureDevice();</br>
-    
+</br> 
 I use default sound card. Change it to your input sound card number.</br>
 (plughw:0,0, plughw:1,0, etc...)</br>    
-
+</br>
 And change the duration time according to your needs in miliseconds.</br>
-</br>
+</br></br>
 auto google_speech = new AlsaTranslator(nullptr);</br>
-QObject::connect(google_speech, &AlsaTranslator::speechChanged, [](auto speech)
-{
-    qDebug() << speech;
-});
-google_speech->setRecordDuration(3000);
-google_speech->start();
-</br>
+QObject::connect(google_speech, &AlsaTranslator::speechChanged, [](auto speech)</br>
+{</br>
+    qDebug() << speech;</br>
+});</br>
+google_speech->setRecordDuration(3000);</br>
+google_speech->start();</br>
+</br></br>
 My purpose of doing this project is to control my robot.</br> 
 I tried it in Raspberry Pi3 and works efficiently.</br>
 
