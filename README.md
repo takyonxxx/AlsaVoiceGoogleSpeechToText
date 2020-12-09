@@ -1,6 +1,13 @@
 # AlsaVoice Google Speech To Text
 
 This project shows you how to send a speech recognition request to Speech-to-Text using the Google REST interface.</br>
+</br>
+#sudo apt-get install libasound2-dev</br>
+#sudo apt-get install alsa alsa-tools</br>
+#sudo apt-get install qtmultimedia5-dev</br>
+#sudo apt install libqt5multimedia5-plugins</br>
+#sudo apt-get install libflac-dev</br>
+</br>
 
 Speech-to-Text enables easy integration of Google speech recognition technologies into developer applications.</br>
 You can send audio data to the Speech-to-Text API, which then returns a text transcription of that audio file.</br> 
