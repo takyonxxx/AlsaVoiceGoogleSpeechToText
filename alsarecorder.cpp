@@ -234,7 +234,7 @@ bool ALSARecorder::record(int mseconds)
 
     qDebug() << "Listening...";
 
-    QThread *thread = QThread::create([this, &mseconds]{
+    QThread *thread = QThread::create([this, mseconds]{
 
         FLAC__bool flac_ok = true;
         FLAC__int32 pcm[get_frames_per_period() * channels];
